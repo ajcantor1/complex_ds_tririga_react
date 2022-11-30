@@ -1,0 +1,14 @@
+.footerButtons {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: row;
+  justify-content: space-between;
+
+
+  &__button {
+    display: flex;
+    flex: 1 1 0;
+  }
+
+
+}

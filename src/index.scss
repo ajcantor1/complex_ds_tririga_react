@@ -1,0 +1,18 @@
+[hidden] {
+  display: none !important;
+}
+
+// Feature flags
+$css--font-face: true;
+$css--helpers: true;
+$css--body: true;
+$css--use-layer: true;
+$css--reset: true;
+$css--typography: true;
+$css--plex: true;
+
+//App styles
+@import "./styles/page";
+@import "./app/TririgaUXWebApp";
+@import "./components/Components";
+@import "./pages/Pages";

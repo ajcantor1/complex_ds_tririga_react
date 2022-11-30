@@ -1,0 +1,54 @@
+{
+  "name": "my-first-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@tririga/cra-template": "1.0.1",
+    "@tririga/tri-deploy": "^1.2.3",
+    "@tririga/tririga-react-components": "^1.2.1",
+    "bootstrap": "^5.2.2",
+    "date-fns": "^2.29.3",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-data-grid": "^7.0.0-beta.19",
+    "react-datepicker": "^4.8.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.4.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "5.0.1",
+    "rsuite": "^5.16.6",
+    "rsuite-table": "^5.7.2",
+    "sass": "^1.54.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "env-cmd -x -f ./.env.development.local tri-deploy -t \\$REACT_APP_TRIRIGA_URL -u \\$TRIRIGA_USER -p \\$TRIRIGA_PASSWORD -c -m 3",
+    "build:deploy": "npm run build && npm run deploy",
+    "lint": "./node_modules/.bin/eslint src",
+    "lint-fix": "./node_modules/.bin/eslint --fix src --ext .js",
+    "pretty-quick": "pretty-quick"
+  },
+  "eslintConfig": {},
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "homepage": ".",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pretty-quick && npm run lint",
+      "pre-push": "npm run lint"
+    }
+  }
+}
