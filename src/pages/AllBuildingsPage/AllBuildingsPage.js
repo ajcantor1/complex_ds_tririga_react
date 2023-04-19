@@ -56,7 +56,7 @@ const AllBuildingsPage = () => {
                         <HeaderCell>Name</HeaderCell>
                         <Cell>
                             {(rowData, rowIndex) => {
-                                return <Link to={`/assetsreview/${rowData.buildingId}`}>{rowData.building}</Link>;
+                                return <Link to={`/assetsreview/${rowData.id}`}>{rowData.building}</Link>;
                             }}
                         </Cell>
                     </Column>

@@ -1,16 +1,6 @@
 import { LoadingServices } from ".";
 import { BuildingsDS } from "../model";
 
-export async function getAllBuildings() {
-    let buildings = [];
-    try {
-        LoadingServices.setLoading("getAllBuildings", true);
-        buildings = await BuildingsDS.getAllBuildings();
-    } finally {
-        LoadingServices.setLoading("getAllBuildings", false);
-    }
-    return buildings;
-}
 
 export async function getAssetReviewTypeCodes() {
     let assetReviewTypeCodes = [];
@@ -44,21 +34,12 @@ export async function getAssetReviewsByBuildingId(id) {
     }
     return buildings;
 }
-export async function getAssetReviews(ids) {
-    let buildings = [];
-    try {
-        LoadingServices.setLoading("getAssetReviews", true);
-        buildings = await BuildingsDS.getAssetReviews(ids);
-    } finally {
-        LoadingServices.setLoading("getAssetReviews", false);
-    }
-    return buildings;
-}
-export async function addAssetReviews(assetReview) {
+
+export async function addAssetReviews(buildingId, assetReview) {
     let response = null;
     try {
         LoadingServices.setLoading("addAssetReview", true);
-        response = await BuildingsDS.addAssetReview(assetReview);
+        response = await BuildingsDS.addAssetReview(buildingId, assetReview);
     } finally {
         LoadingServices.setLoading("addAssetReview", false);
     }

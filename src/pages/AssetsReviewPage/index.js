@@ -20,10 +20,13 @@ const AssetsReviewPage = () => {
     const [selectedReviewCode, setSelectedReviewCode] = useState('')
     const [selectedDate, setSelectedDate] = useState('');
     const [openModal, setOpenModal] = useState(false);
+    const [refresh, setRefresh] = useState(true);
+    const [sortDescOrder, setSortDescOrder] = useState(false);
+
     const headers = [
         {
-            key: "id",
-            header: "id",
+            key: "RPIMID",
+            header: "RPIMID",
         },
         {
             key: "assetReviewTypeCode",
@@ -38,39 +41,58 @@ const AssetsReviewPage = () => {
 
     useEffect(() => {
         (async () => {
-            let assetReviewCodes = await BuildingsServices.getAssetReviewTypeCodes();
-            assetReviewCodes.forEach((item) => {
-                item.id = item._id;
-            });
-            setSelectedReviewCode(assetReviewCodes[0].name);
-            setAssetReviewCodes(assetReviewCodes);
-            await loadAsssetReviews(id)
-
+            if(refresh) {
+                let assetReviewCodes = await BuildingsServices.getAssetReviewTypeCodes();
+                assetReviewCodes.forEach((item) => {
+                    item.id = item._id;
+                });
+                setSelectedReviewCode(assetReviewCodes[0]);
+                setAssetReviewCodes(assetReviewCodes);
+                await loadAsssetReviews(id);
+                setRefresh(false)
+            }
         })();
-    }, [id]);
+    }, [refresh]);
 
     const loadAsssetReviews = async (id) => {
         let _assetReviewsByBuildingId = await BuildingsServices.getAssetReviewsByBuildingId(id);
-        let rpimIds = _assetReviewsByBuildingId.map((assetReviewById) => {
-            return assetReviewById.rpimId;
+        console.log(_assetReviewsByBuildingId)
+        _assetReviewsByBuildingId = await sortAssetReviews(_assetReviewsByBuildingId)
+        await setAssetReviews(_assetReviewsByBuildingId);
+    }
+
+    const sortAssetReviews = async (_assetReviews) => {
+
+        return _assetReviews.sort((assetReview1, assetReview2) => {
+            if(sortDescOrder) {
+                return new Date(assetReview2.assetReviewDate) - new Date(assetReview1.assetReviewDate);
+            } else {
+                return new Date(assetReview1.assetReviewDate) - new Date(assetReview2.assetReviewDate);
+            }
+            
+            
         });
-
-        let _assetReviews = await BuildingsServices.getAssetReviews(rpimIds)
-
-        setAssetReviews(_assetReviews);
     }
     const addAssetReview = async (event) => {
-
-        await BuildingsServices.addAssetReviews({
-            buildingId: id,
-            assetReviewTypeCode: selectedReviewCode,
-            assetReviewDate: selectedDate,
+        console.log(selectedReviewCode)
+        await BuildingsServices.addAssetReviews(id, {
+            cstBuildingSpecId: id,
+            assetReviewTypeCode: {id: selectedReviewCode.id, value: selectedReviewCode.name},
+            assetReviewDate: selectedDate.toISOString(),
         });
         setOpenModal(false);
+        setRefresh(true);
+        
     }
 
     const onAssetReviewCodeChange = async (event) => {
         setSelectedReviewCode(event.target.value)
+
+    }
+
+    const onSort = async (sortColumn, sortType) => {
+        await setSortDescOrder(!sortDescOrder);
+        setRefresh(true);
     }
 
     return (
@@ -87,7 +109,7 @@ const AssetsReviewPage = () => {
                         <div>
                             <select onChange={event => onAssetReviewCodeChange(event)}>
                                 {assetReviewCodes.map((reviewCode) => 
-                                    <option value={reviewCode.name}>{reviewCode.name}</option>
+                                    <option value={reviewCode}>{reviewCode.name}</option>
                                 )}
                             </select>
                         </div>
@@ -102,21 +124,27 @@ const AssetsReviewPage = () => {
             </Modal>
             <div className='asset-review-grid-frame'>
                 <div className='heading-container'><h2>Asset Reviews</h2></div>
-                <Table data={assetReviews}>
+                <Table data={assetReviews} onSortColumn={onSort}>
                     <Column width={150}>
                         <HeaderCell>ID</HeaderCell>
-                        <Cell dataKey="id" />
+                        <Cell dataKey="RPIMID" />
                     </Column>
                     <Column width={200}>
                         <HeaderCell>Asset Review Type Code</HeaderCell>
-                        <Cell dataKey="assetReviewTypeCode" />
-                    </Column>
-                    <Column width={200}>
-                        <HeaderCell>Asset Review Date</HeaderCell>
                         <Cell>
                             {(rowData, rowIndex) => {
                                 return (
-                                format(new Date(rowData.assetReviewDate), 'dd/MM/yyyy')
+                                    rowData.assetReviewTypeCode.value
+                                )
+                            }}
+                        </Cell>
+                    </Column>
+                    <Column width={200} sortable>
+                        <HeaderCell>Asset Review Date</HeaderCell>
+                        <Cell dataKey="assetReviewDate">
+                            {(rowData, rowIndex) => {
+                                return (
+                                format(new Date(rowData.assetReviewDate), 'MM/dd/yyyy')
                                 )
                             }}
                         </Cell>

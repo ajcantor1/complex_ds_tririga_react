@@ -1,12 +1,7 @@
 import { getAppModel } from "../AppModel";
 import { DatasourceNames } from "../../utils";
 
-export async function getAllBuildings() {
-    const response = await getAppModel().getRecord(
-        DatasourceNames.BUILDINGS_DS_NAME
-    );
-    return response.data;
-}
+
 
 export async function getAssetReviewTypeCodes() {
     const response = await getAppModel().getRecord(
@@ -15,12 +10,12 @@ export async function getAssetReviewTypeCodes() {
     return response.data;
 }
 
-export async function getBuildingsById(id) {
+export async function getBuildingsById(name) {
     const response = await getAppModel().getRecord(
         DatasourceNames.BUILDINGS_DS_NAME,
         {
             filters: [
-                { name: "building", operator: "contains", value: id },
+                { name: "building", operator: "contains", value: name },
             ]
         }
     );
@@ -29,40 +24,21 @@ export async function getBuildingsById(id) {
 
 export async function getAssetReviewsByBuildingId(id) {
     const response = await getAppModel().getRecord(
-        DatasourceNames.ASSET_REVIEW_BUILDING_ID_DS_NAME,
-        {
-            filters: [
-                { name: "buildingId", operator: "equals", value: id },
-            ]
-        }
+        `buildingRPIMAssetReview/${id}/assetReviews`
     );
     return response.data;
 }
 
-export async function getAssetReviews(ids) {
-    let filters = []
-    ids.forEach((id, idx) => {
-        filters.push({ name: "id", operator: "equals", value: id });
-        if (idx < ids.length - 1) {
-            filters.push({ operator: "or" });
-        }
-    });
-    const response = await getAppModel().getRecord(
-        DatasourceNames.ASSET_REVIEW_DS_NAME,
-        {
-            filters: filters
-        }
-    );
-    return response.data;
-}
 
-export async function addAssetReview(assetReview) {
+
+export async function addAssetReview(buildingSpecId, assetReview) {
     console.log("Asset Review Object:")
     console.log(assetReview)
-    const idRequestResponse = await getAppModel().createRecord(DatasourceNames.ADD_ASSET_REVIEW, assetReview, true, "actions", "create");
-    console.log(idRequestResponse)
-    //const response = await getAppModel().addRecord(DatasourceNames.ADD_ASSET_REVIEW, idRequestResponse.createdRecordId, true);
-    //console.log(response)
-    return idRequestResponse;
+    const requestResponse = await getAppModel().createRecord(`buildingRPIMAssetReview/${buildingSpecId}/assetReviews`, assetReview, {}, true, "group", "triCreate");
 
+    //const requestResponse = await getAppModel().performAction("buildingRPIMAssetReview", 136763165, true, "group", "preCreate");
+    //const wfParameterMap = {assetReviewTypeCode: "APPR", assetReviewDate: '2023-02-09'}
+    //const requestResponse = await getAppModel().performAction("buildingRPIMAssetReview", 136763165, {}, true, "group", "preCreate", wfParameterMap);
+    console.log(requestResponse)
+    return requestResponse;
 }
